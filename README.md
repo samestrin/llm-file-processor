@@ -1,5 +1,9 @@
 # LLM File Processor
 
+[![Star on GitHub](https://img.shields.io/github/stars/samestrin/llm-file-processor?style=social)](https://github.com/samestrin/llm-file-processor/stargazers) [![Fork on GitHub](https://img.shields.io/github/forks/samestrin/llm-file-processor?style=social)](https://github.com/samestrin/llm-file-processor/network/members) [![Watch on GitHub](https://img.shields.io/github/watchers/samestrin/llm-file-processor?style=social)](https://github.com/samestrin/llm-file-processor/watchers)
+
+![Version 1.0.0](https://img.shields.io/badge/Version-1.0.0-blue) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Built with Node.js](https://img.shields.io/badge/Built%20with-Node.js-green)](https://nodejs.org/)
+
 > **Automate, standardize, and enrich your files at scale with LLM-powered transformations**
 
 A flexible Node.js CLI that applies custom LLM prompts to files or entire directories—turn unstructured documentation, code, or data into consistent, structured, and actionable outputs with minimal effort.
@@ -14,7 +18,7 @@ A flexible Node.js CLI that applies custom LLM prompts to files or entire direct
 * **Prompt Validation**: Built-in LLM-based prompt sanity checks to ensure your rules translate into valid transformations.
 * **Rich CLI UX**: Spinner-based progress indicators, colorized output, and detailed error reporting.
 
-## Compelling Use Cases
+## Use Cases
 
 1. **Uniform Documentation**
    Standardize a scattered collection of markdown files—add TOCs, enforce heading hierarchies, flag missing sections, and generate summary sections automatically.
@@ -113,6 +117,14 @@ Craft transformation rules in your prompt file to guide the LLM. Example:
 4. Append a `## Key Takeaways` section at the end.
 ```
 
+## Contribute
+
+Contributions to this project are welcome. Please fork the repository and submit a pull request with your changes or improvements.
+
 ## License
 
-[MIT](LICENSE)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Share
+
+[![Twitter](https://img.shields.io/badge/X-Tweet-blue)](https://twitter.com/intent/tweet?text=Check%20out%20this%20awesome%20project!&url=https://github.com/samestrin/llm-file-processor) [![Facebook](https://img.shields.io/badge/Facebook-Share-blue)](https://www.facebook.com/sharer/sharer.php?u=https://github.com/samestrin/llm-file-processor) [![LinkedIn](https://img.shields.io/badge/LinkedIn-Share-blue)](https://www.linkedin.com/sharing/share-offsite/?url=https://github.com/samestrin/llm-file-processor)
