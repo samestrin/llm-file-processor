@@ -1,0 +1,31 @@
+{
+    "name": "llm-file-processor",
+    "version": "1.0.0",
+    "description": "Process files through LLM with custom prompts",
+    "main": "llm-file-processor.js",
+    "bin": {
+      "llm-file-processor": "./llm-file-processor.js"
+    },
+    "scripts": {
+      "start": "node llm-file-processor.js"
+    },
+    "keywords": [
+      "llm",
+      "file",
+      "processing",
+      "cli",
+      "groq"
+    ],
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+      "axios": "^1.6.7",
+      "chalk": "^4.1.2",
+      "commander": "^11.1.0",
+      "dotenv": "^16.4.1",
+      "glob": "^10.3.10",
+      "lodash": "^4.17.21",
+      "mkdirp": "^3.0.1",
+      "ora": "^5.4.1"
+    }
+  }
