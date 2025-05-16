@@ -171,9 +171,9 @@ The `examples/` directory is structured as follows:
     *   `README.md`
     *   `changes.diff`
     *   `index.js`
-*   **Notes (`notes.md`):** Recommends saving output as a merged text file. Provides the test command:
+*   **Notes (`notes.md`):** Recommends saving output as a merged text file with the name `github.txt`. Provides the test command:
     ```bash
-    llm-file-processor -p examples/ci_cd_integration/prompt.md -d examples/ci_cd_integration/files -m txt
+    llm-file-processor -p examples/ci_cd_integration/prompt.md -d examples/ci_cd_integration/files -m github.txt
     ```
 
 ### 10. Training Data Preparation
