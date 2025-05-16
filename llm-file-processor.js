@@ -22,6 +22,10 @@ program
   .requiredOption('-p, --prompt-file <filename>', 'Path to the prompt file')
   .option('-f, --file <filename>', 'Path to the file to be processed')
   .option('-d, --directory <directory>', 'Path to the directory containing files to be processed')
+  .option('-o, --output <directory>', 'Specify a custom output directory') // New option
+  .option('--insert-before-ext <text>', 'Insert text before file extension (e.g., ".test" to create "file.test.js" from "file.js")')
+  .option('--output-ext <extension>', 'Change or add file extension (e.g., "json" to save as "file.log.json")')
+  .option('-m, --merge <filename>', 'Merge all processed files into a single output file with the specified <filename>')
   .option('--dry-run', 'Combine prompts and files without sending to LLM', false)
   .option('--batch-size <size>', 'Number of files to process in one batch', 1)
   .option('--delay <ms>', 'Delay between API calls in milliseconds', 500)
@@ -30,7 +34,7 @@ program
 const options = program.opts();
 
 // Create output directory with timestamp
-const getOutputDir = () => {
+const getTimestampedOutputDir = () => { // Renamed for clarity
   const now = new Date();
   const timestamp = now.toISOString().replace(/:/g, '-').replace(/\..+/, '');
   return `./processed-${timestamp}`;
@@ -78,10 +82,11 @@ Only return valid JSON that matches this schema exactly. Do not include any expl
     };
   }
 
+
   try {
     // Get API URL from environment variable or use default Open AI endpoint
     const apiUrl = process.env.OPENAI_API_URL || 'https://api.openai.com/v1/chat/completions';
-    
+
     const response = await axios.post(
       apiUrl,
       {
@@ -123,7 +128,10 @@ Only return valid JSON that matches this schema exactly. Do not include any expl
 // Validate prompt with LLM (only for bulk processing)
 const validatePrompt = async (promptContent) => {
   const validationPrompt = `
-Please evaluate the following formatting prompt and decide if it is a valid formatting prompt that can be used to modify the format of an existing text file and transform it into a new text file.
+Please evaluate the following prompt and decide if it is a valid prompt that can be used to process a text file and return a structured JSON output.
+
+Consider the type of task the prompt is designed for (e.g., formatting, code review, data extraction).
+The prompt should clearly define the rules for processing the file and the expected JSON output format.
 
 # Prompt to evaluate
 ${promptContent}
@@ -131,18 +139,21 @@ ${promptContent}
 Return only JSON in the following format:
 {
   "isValid": true/false,
-  "reason": "Brief explanation of your decision"
+  "reason": "Brief explanation of your decision, including the type of prompt you believe it is (e.g., formatting, code_review, data_extraction, summarization).",
+  "promptType": "formatting|code_review|data_extraction|summarization|other"
 }`;
 
   try {
+    // Get API URL from environment variable or use default Open AI endpoint
+    const apiUrl = process.env.OPENAI_API_URL || 'https://api.openai.com/v1/chat/completions';
     const spinner = ora('Validating prompt...').start();
-    
+
     const response = await axios.post(
-      'https://api.groq.com/openai/v1/chat/completions',
+       apiUrl,
       {
         model: process.env.OPENAI_MODEL,
         messages: [
-          { role: 'system', content: 'You are a prompt validation assistant.' },
+          { role: 'system', content: 'You are a prompt validation assistant. Your task is to determine if a given prompt is suitable for file processing tasks and to identify its type.' },
           { role: 'user', content: validationPrompt }
         ],
         response_format: { type: 'json_object' }
@@ -156,17 +167,19 @@ Return only JSON in the following format:
     );
 
     spinner.stop();
-    
+
     try {
       const jsonResponse = JSON.parse(response.data.choices[0].message.content);
       if (!jsonResponse.isValid) {
         console.error(chalk.red(`Prompt validation failed: ${jsonResponse.reason}`));
         return false;
       }
-      console.log(chalk.green(`Prompt validation successful: ${jsonResponse.reason}`));
+      // You can add more specific validation logic here based on jsonResponse.promptType if needed
+      console.log(chalk.green(`Prompt validation successful. Type: ${jsonResponse.promptType}. Reason: ${jsonResponse.reason}`));
       return true;
     } catch (parseError) {
       console.error(chalk.red(`Error parsing validation response: ${parseError.message}`));
+      console.error(chalk.yellow('Raw validation response:'), response.data.choices[0].message.content);
       return false;
     }
   } catch (error) {
@@ -179,8 +192,10 @@ Return only JSON in the following format:
 };
 
 // Process files in batches
-const processBatch = async (promptContent, files, outputDir, batchSize) => {
+// Process files in batches and collect results
+const processBatchAndCollect = async (promptContent, files, outputDir, batchSize) => {
   const batches = _.chunk(files, batchSize);
+  const allResults = [];
   
   for (let i = 0; i < batches.length; i++) {
     const batch = batches[i];
@@ -195,25 +210,40 @@ const processBatch = async (promptContent, files, outputDir, batchSize) => {
         
         if (options.dryRun) {
           spinner.succeed(`Dry run for ${path.basename(file)} complete`);
-          return result;
-        }
-        
-        if (!result) {
-          spinner.fail(`Failed to process ${path.basename(file)}`);
           return null;
         }
         
-        const outputPath = path.join(outputDir, path.basename(file));
-        await fs.writeFile(outputPath, result.processedContent);
-        spinner.succeed(`Processed ${path.basename(file)}`);
-        return result;
+        if (!result || typeof result.processedContent === 'undefined') {
+          spinner.fail(`Failed to process ${path.basename(file)} or received no content`);
+          return null;
+        }
+        
+        // Transform the filename based on CLI options
+        const transformedFilename = transformFilename(path.basename(file));
+        const outputPath = path.join(outputDir, transformedFilename);
+        
+        // Ensure content is a string before writing
+        const contentToWrite = typeof result.processedContent === 'string' 
+          ? result.processedContent 
+          : JSON.stringify(result.processedContent, null, 2);
+        
+        await fs.writeFile(outputPath, contentToWrite);
+        spinner.succeed(`Processed ${path.basename(file)} → ${transformedFilename}`);
+        
+        // Return the result for potential merging
+        return {
+          filename: transformedFilename,
+          content: contentToWrite
+        };
       } catch (error) {
         spinner.fail(`Error processing ${path.basename(file)}: ${error.message}`);
         return null;
       }
     });
     
-    await Promise.all(batchPromises);
+    const batchResults = await Promise.all(batchPromises);
+    // Filter out null results and add to allResults
+    allResults.push(...batchResults.filter(r => r !== null));
     
     // Add delay between batches if not the last batch
     if (i < batches.length - 1 && !options.dryRun) {
@@ -221,6 +251,8 @@ const processBatch = async (promptContent, files, outputDir, batchSize) => {
       await new Promise(resolve => setTimeout(resolve, options.delay));
     }
   }
+  
+  return allResults;
 };
 
 // Main function
@@ -243,13 +275,20 @@ const main = async () => {
     const promptContent = await fs.readFile(options.promptFile, 'utf8');
     console.log(chalk.green('Prompt file loaded successfully'));
     
-    // Create output directory if not dry run
+    // Determine and create output directory if not dry run
     let outputDir = null;
     if (!options.dryRun) {
-      outputDir = getOutputDir();
-      await mkdirp(outputDir);
-      console.log(chalk.green(`Output directory created: ${outputDir}`));
+      if (options.output) { // Check if custom output directory is provided
+        outputDir = options.output;
+      } else {
+        outputDir = getTimestampedOutputDir(); // Use timestamped if not
+      }
+      await mkdirp(outputDir); // Create the determined output directory
+      console.log(chalk.green(`Output directory set to: ${outputDir}`));
     }
+    
+    // Track processed results for potential merging
+    const processedResults = [];
     
     // Single file processing
     if (options.file) {
@@ -263,9 +302,23 @@ const main = async () => {
           console.log(chalk.yellow('Dry run - combined prompt:'));
           console.log(result.prompt);
         } else if (result) {
-          const outputPath = path.join(outputDir, path.basename(options.file));
-          await fs.writeFile(outputPath, result.processedContent);
+          // Transform the filename based on CLI options
+          const transformedFilename = transformFilename(path.basename(options.file));
+          const outputPath = path.join(outputDir, transformedFilename);
+          
+          // Ensure content is a string before writing
+          const contentToWrite = typeof result.processedContent === 'string' 
+            ? result.processedContent 
+            : JSON.stringify(result.processedContent, null, 2);
+          
+          await fs.writeFile(outputPath, contentToWrite);
           console.log(chalk.green(`File processed and saved to: ${outputPath}`));
+          
+          // Store for potential merging
+          processedResults.push({
+            filename: transformedFilename,
+            content: contentToWrite
+          });
         }
       } catch (error) {
         console.error(chalk.red(`Error reading or processing file: ${error.message}`));
@@ -294,14 +347,20 @@ const main = async () => {
         }
       }
       
-      // Process files in batches
-      await processBatch(promptContent, files, outputDir, parseInt(options.batchSize));
+      // Process files in batches and collect results
+      const batchResults = await processBatchAndCollect(promptContent, files, outputDir, parseInt(options.batchSize));
+      processedResults.push(...batchResults);
       
       if (!options.dryRun) {
         console.log(chalk.green(`All files processed and saved to: ${outputDir}`));
       } else {
         console.log(chalk.yellow('Dry run completed. No files were processed.'));
       }
+    }
+    
+    // Merge files if requested and not in dry run mode
+    if (options.merge && !options.dryRun && processedResults.length > 0) {
+      await mergeProcessedFiles(processedResults, outputDir, options.merge); 
     }
   } catch (error) {
     console.error(chalk.red(`Error: ${error.message}`));
@@ -310,3 +369,49 @@ const main = async () => {
 };
 
 main();
+
+// Transform filename based on CLI options
+const transformFilename = (filename) => {
+  let basename = path.basename(filename);
+  const extname = path.extname(basename);
+  const nameWithoutExt = basename.slice(0, basename.length - extname.length);
+  
+  // Apply insert-before-ext option if provided
+  if (options.insertBeforeExt) {
+    basename = nameWithoutExt + options.insertBeforeExt + extname;
+  }
+  
+  // Apply output-ext option if provided
+  if (options.outputExt) {
+    // Check if the file already has the specified extension
+    const requestedExt = options.outputExt.startsWith('.') ? options.outputExt : `.${options.outputExt}`;
+    if (!basename.endsWith(requestedExt)) {
+      basename = basename + requestedExt;
+    }
+  }
+  
+  return basename;
+};
+
+
+// Merge processed files into a single output file
+const mergeProcessedFiles = async (results, outputDir, mergeOutputFilename) => {
+  if (results.length === 0) {
+    console.log(chalk.yellow('No files to merge.'));
+    return;
+  }
+  
+  // Use the provided filename directly for the merged file
+  const mergePath = path.join(outputDir, mergeOutputFilename);
+  
+  // Create the merged content
+  let mergedContent = '';
+  
+  for (const result of results) {
+    mergedContent += `\n\n# File: ${result.filename}\n\n${result.content}`;
+  }
+  
+  // Write the merged file
+  await fs.writeFile(mergePath, mergedContent.trim());
+  console.log(chalk.green(`Merged ${results.length} files into: ${mergePath}`));
+};
