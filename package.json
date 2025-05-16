@@ -1,7 +1,7 @@
 {
     "name": "llm-file-processor",
     "version": "1.0.0",
-    "description": "Process files through LLM with custom prompts",
+    "description": "Automate, standardize, and enrich your files at scale with LLM-powered transformations",
     "main": "llm-file-processor.js",
     "bin": {
       "llm-file-processor": "./llm-file-processor.js"
