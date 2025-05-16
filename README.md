@@ -51,6 +51,20 @@ A flexible Node.js CLI that applies custom LLM prompts to files or entire direct
 
 ## Installation
 
+You can install the LLM File Processor globally via npm:
+
+```bash
+npm install -g llm-file-processor
+```
+
+Alternatively, you can use `npx` to run it without installing globally:
+
+```bash
+npx llm-file-processor [options]
+```
+
+If you prefer to clone the repository and run it locally:
+
 ```bash
 # Clone repository
 git clone https://github.com/samestrin/llm-file-processor.git
@@ -59,11 +73,11 @@ cd llm-file-processor
 # Install dependencies
 npm install
 
-# Make CLI executable
+# Make CLI executable (if running directly)
 chmod +x llm-file-processor.js
 
-# (Optional) Link globally
-e.g. npm link
+# (Optional) Link globally for local development
+npm link
 ```
 
 ## Configuration
