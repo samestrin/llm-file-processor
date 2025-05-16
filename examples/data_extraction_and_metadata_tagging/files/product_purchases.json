@@ -1,0 +1,87 @@
+{
+    "store_transactions": [
+      {
+        "transaction_id": "TX-2023-0001",
+        "customer": {"id": "C-2345", "name": "John Smith", "email": "john.s@example.com"},
+        "date": "2023-02-10T14:30:45Z",
+        "items": [
+          {"product": "Yoga Mat", "category": "Fitness", "price": 35.99, "quantity": 1},
+          {"product": "Water Bottle", "category": "Fitness", "price": 12.99, "quantity": 2}
+        ],
+        "payment": {"method": "credit", "total": 61.97}
+      },
+      {
+        "transaction_id": "TX-2023-0002",
+        "customer": {"id": "C-8976", "name": "Alice Johnson", "email": "alice.j@example.com"},
+        "date": "2023-02-12T10:15:22Z",
+        "items": [
+          {"product": "Desk Lamp", "category": "Home Office", "price": 45.50, "quantity": 1},
+          {"product": "Notebook Set", "category": "Stationery", "price": 18.75, "quantity": 1},
+          {"product": "Pen Pack", "category": "Stationery", "price": 8.99, "quantity": 3}
+        ],
+        "payment": {"method": "paypal", "total": 100.72}
+      },
+      {
+        "transaction_id": "TX-2023-0018",
+        "customer": {"id": "C-2345", "name": "John Smith", "email": "john.s@example.com"},
+        "date": "2023-04-05T16:22:30Z",
+        "items": [
+          {"product": "Dumbbells Set", "category": "Fitness", "price": 129.99, "quantity": 1},
+          {"product": "Fitness Tracker", "category": "Electronics", "price": 89.95, "quantity": 1}
+        ],
+        "payment": {"method": "credit", "total": 219.94}
+      },
+      {
+        "transaction_id": "TX-2023-0031",
+        "customer": {"id": "C-4532", "name": "Maria Garcia", "email": "maria.g@example.com"},
+        "date": "2023-05-20T11:45:18Z",
+        "items": [
+          {"product": "Summer Dress", "category": "Clothing", "price": 59.99, "quantity": 2},
+          {"product": "Sunhat", "category": "Accessories", "price": 24.50, "quantity": 1},
+          {"product": "Sandals", "category": "Footwear", "price": 42.99, "quantity": 1}
+        ],
+        "payment": {"method": "debit", "total": 187.47}
+      },
+      {
+        "transaction_id": "TX-2023-0042",
+        "customer": {"id": "C-8976", "name": "Alice Johnson", "email": "alice.j@example.com"},
+        "date": "2023-07-08T15:10:05Z",
+        "items": [
+          {"product": "Beach Towel", "category": "Summer", "price": 22.99, "quantity": 2},
+          {"product": "Sunscreen", "category": "Health", "price": 15.50, "quantity": 1}
+        ],
+        "payment": {"method": "paypal", "total": 61.48}
+      },
+      {
+        "transaction_id": "TX-2023-0061",
+        "customer": {"id": "C-2345", "name": "John Smith", "email": "john.s@example.com"},
+        "date": "2023-09-14T09:30:45Z",
+        "items": [
+          {"product": "Running Shoes", "category": "Footwear", "price": 129.99, "quantity": 1},
+          {"product": "Athletic Socks", "category": "Clothing", "price": 12.99, "quantity": 3}
+        ],
+        "payment": {"method": "credit", "total": 168.96}
+      },
+      {
+        "transaction_id": "TX-2023-0075",
+        "customer": {"id": "C-4532", "name": "Maria Garcia", "email": "maria.g@example.com"},
+        "date": "2023-10-25T14:20:38Z",
+        "items": [
+          {"product": "Halloween Costume", "category": "Seasonal", "price": 49.99, "quantity": 1},
+          {"product": "Decorative Pumpkins", "category": "Home Decor", "price": 18.99, "quantity": 2}
+        ],
+        "payment": {"method": "debit", "total": 87.97}
+      },
+      {
+        "transaction_id": "TX-2023-0089",
+        "customer": {"id": "C-8976", "name": "Alice Johnson", "email": "alice.j@example.com"},
+        "date": "2023-11-30T12:05:55Z",
+        "items": [
+          {"product": "Winter Coat", "category": "Clothing", "price": 189.99, "quantity": 1},
+          {"product": "Gloves", "category": "Accessories", "price": 25.50, "quantity": 1},
+          {"product": "Scarf", "category": "Accessories", "price": 22.99, "quantity": 1}
+        ],
+        "payment": {"method": "credit", "total": 238.48}
+      }
+    ]
+  }

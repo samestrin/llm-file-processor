@@ -1,0 +1,17 @@
+Transaction_ID,Customer_ID,Date,Products,Quantity,Unit_Price,Total
+T-1001,C-5892,2023-01-15,"Laptop, Laptop Stand",1,899.99,899.99
+T-1002,C-6723,2023-01-16,"Coffee Maker, Coffee Beans",1,129.99,149.98
+T-1003,C-5892,2023-02-03,"Mouse, Keyboard",2,39.99,79.98
+T-1004,C-8256,2023-02-17,"Headphones",1,69.99,69.99
+T-1005,C-6723,2023-03-10,"Coffee Filters, Mug Set",3,12.99,38.97
+T-1006,C-9142,2023-04-05,"Blender, Measuring Cups",1,79.99,94.98
+T-1007,C-5892,2023-04-20,"External Hard Drive",1,129.99,129.99
+T-1008,C-7451,2023-05-12,"Garden Tools Set",1,59.99,59.99
+T-1009,C-6723,2023-06-01,"Ice Cream Maker",1,89.99,89.99
+T-1010,C-5892,2023-06-15,"Smart Watch, Watch Band",1,249.99,274.98
+T-1011,C-8256,2023-07-03,"Sunglasses, Beach Towel",2,24.99,49.98
+T-1012,C-9142,2023-08-18,"Kitchen Knife Set",1,199.99,199.99
+T-1013,C-7451,2023-09-02,"Plant Pots, Seeds Packets",4,15.99,63.96
+T-1014,C-5892,2023-10-10,"Bluetooth Speaker",1,89.99,89.99
+T-1015,C-6723,2023-11-25,"Slow Cooker, Recipe Book",1,149.99,159.98
+T-1016,C-9142,2023-12-10,"Christmas Lights, Ornaments",3,29.99,89.97

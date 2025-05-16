@@ -1,0 +1,7 @@
+{
+    "title": "MyApp",
+    "description": "A simple app to manage tasks.",
+    "welcome_message": "Hello, {{username}}! You have 5 new notifications.",
+    "logout": "",
+    "submit_button": "Submit"
+}

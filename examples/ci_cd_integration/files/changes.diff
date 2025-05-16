@@ -1,0 +1,10 @@
+diff --git a/src/utils.js b/src/utils.js
+index e69de29..4b825dc 100644
+--- a/src/utils.js
++++ b/src/utils.js
+@@ -0,0 +1,5 @@
++export function greet(name) {
++    console.log("Hello, " + name );
++}
++
++export default greet;

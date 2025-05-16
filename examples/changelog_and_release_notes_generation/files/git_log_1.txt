@@ -1,0 +1,108 @@
+commit fe8a294d5c7f6e29b8a0a4a7f129e5b3e6d8c72a
+Author: Alex Johnson <alex@example.com>
+Date:   Mon May 12 2025 09:32:21 GMT+0000
+
+    feat(dashboard): implement real-time data visualization #456
+    
+    - Added WebSocket connection for live updates
+    - Created new chart components for time series data
+    - Implemented user preferences for display options
+
+diff --git a/src/components/Dashboard/Charts.js b/src/components/Dashboard/Charts.js
+new file mode 100644
+index 0000000..a8b42d3
+--- /dev/null
++++ b/src/components/Dashboard/Charts.js
+@@ -0,0 +1,87 @@
++// New chart components implementation
++
+diff --git a/src/services/websocket.js b/src/services/websocket.js
+new file mode 100644
+index 0000000..f6c9d23
+--- /dev/null
++++ b/src/services/websocket.js
+@@ -0,0 +1,65 @@
++// WebSocket service implementation
+
+commit b76d520f3a1c9b8e7d4f2a1c9b8e7d4f2a1c9b8
+Author: Sophia Chen <sophia@example.com>
+Date:   Mon May 12 2025 11:47:15 GMT+0000
+
+    fix(api): resolve race condition in authentication middleware #478
+    
+    - Fixed timing issue in token verification
+    - Added proper error handling for expired tokens
+    - Updated tests to cover edge cases
+
+diff --git a/src/middleware/auth.js b/src/middleware/auth.js
+index 7d8f2a1..9b8e7d4 100644
+--- a/src/middleware/auth.js
++++ b/src/middleware/auth.js
+@@ -25,7 +25,10 @@ function verifyToken(token) {
+-  return jwt.verify(token, SECRET_KEY);
++  try {
++    return jwt.verify(token, SECRET_KEY);
++  } catch (err) {
++    handleTokenError(err);
++  }
+ }
+
+commit c3e5d7f9a1b3c5e7d9f1a3b5c7e9d1f3a5b7c9e
+Author: Marcus Williams <marcus@example.com>
+Date:   Tue May 13 2025 14:23:09 GMT+0000
+
+    docs: update API documentation with new endpoints
+
+diff --git a/docs/api-reference.md b/docs/api-reference.md
+index a1b2c3d..e5f6g7h 100644
+--- a/docs/api-reference.md
++++ b/docs/api-reference.md
+@@ -120,6 +120,25 @@ Response:
+   "message": "User created successfully"
+ }
+```
++### User Dashboard API
++
++#### GET /api/dashboard/stats
++
+commit d4f6a8b0c2e4d6f8a0b2c4d6f8a0b2c4d6f8a0b
+Author: Priya Patel <priya@example.com>
+Date:   Tue May 13 2025 16:05:42 GMT+0000
+
+    perf: optimize database queries for dashboard loading #492
+    
+    - Reduced query count by implementing composite endpoints
+    - Added caching layer for frequently accessed metadata
+    - Query execution time improved by 78%
+
+diff --git a/src/services/dashboard.js b/src/services/dashboard.js
+index b2c4d6f..8a0c2e4 100644
+--- a/src/services/dashboard.js
++++ b/src/services/dashboard.js
+@@ -45,12 +45,7 @@ async function getUserDashboardData(userId) {
+-  const userData = await db.users.findById(userId);
+-  const userPrefs = await db.preferences.findByUserId(userId);
+-  const notifications = await db.notifications.findByUserId(userId);
+-  const recentActivity = await db.activity.findByUserId(userId);
+-  
+-  return { userData, userPrefs, notifications, recentActivity };
++  return await db.getUserCompositeData(userId);
+ }
+
+commit e5g7i9k1m3o5q7s9u1w3y5a7c9e1g3i5k7m9o
+Author: James Lee <james@example.com>
+Date:   Wed May 14 2025 10:17:33 GMT+0000
+
+    test: add integration tests for real-time dashboard features
+    
+    - Created test fixtures for WebSocket connections
+    - Added snapshots for chart rendering
+    - Implemented mocking for time-sensitive operations
+
+diff --git a/tests/integration/dashboard.test.js b/tests/integration/dashboard.test.js
+new file mode 100644
+index 0000000..d7e9f1a
+--- /dev/null
++++ b/tests/integration/dashboard.test.js
+@@ -0,0 +1,120 @@
++// Dashboard integration tests

@@ -1,0 +1,4 @@
+[
+    {"user":"alice","action":"login","time":"2025-05-01T08:00:00Z"},
+    {"user":"bob","action":"logout","time":"2025-05-01T09:15:00Z"}
+  ]
