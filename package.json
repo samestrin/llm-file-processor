@@ -7,17 +7,41 @@
       "llm-file-processor": "./llm-file-processor.js"
     },
     "scripts": {
-      "start": "node llm-file-processor.js"
+      "start": "node llm-file-processor.js",
+      "test": "echo \"No tests specified\" && exit 0",
+      "prepublishOnly": "npm test"
     },
     "keywords": [
       "llm",
       "file",
       "processing",
       "cli",
-      "groq"
+      "groq",
+      "openai",
+      "gpt",
+      "ai",
+      "automation",
+      "transformation"
     ],
-    "author": "",
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/samestrin/llm-file-processor.git"
+    },
+    "author": "Sam Estrin",
     "license": "MIT",
+    "bugs": {
+      "url": "https://github.com/samestrin/llm-file-processor/issues"
+    },
+    "homepage": "https://github.com/samestrin/llm-file-processor#readme",
+    "engines": {
+      "node": ">=14.0.0"
+    },
+    "files": [
+      "llm-file-processor.js",
+      "README.md",
+      "LICENSE",
+      ".env.example"
+    ],
     "dependencies": {
       "axios": "^1.6.7",
       "chalk": "^4.1.2",
