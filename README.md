@@ -16,7 +16,6 @@ A flexible Node.js CLI that applies custom LLM prompts to files or entire direct
 * **Dry-Run Mode**: Preview combined prompts without making API calls, perfect for testing and validation.
 * **JSON-First Output**: Receive clean, machine-readable JSON responses for seamless integration into pipelines.
 * **Prompt Validation**: Built-in LLM-based prompt sanity checks to ensure your rules translate into valid transformations.
-* **Rich CLI UX**: Spinner-based progress indicators, colorized output, and detailed error reporting.
 
 ## Use Cases
 
