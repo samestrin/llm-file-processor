@@ -33,14 +33,28 @@ program
 
 const options = program.opts();
 
-// Create output directory with timestamp
+/**
+ * Creates an output directory name with a timestamp.
+ * 
+ * @returns {string} The path to a timestamped output directory.
+ * 
+ * @example
+ * // Get a timestamped output directory path
+ * const outputDir = getTimestampedOutputDir(); // './processed-2023-01-01T12-00-00'
+ */
 const getTimestampedOutputDir = () => { // Renamed for clarity
   const now = new Date();
   const timestamp = now.toISOString().replace(/:/g, '-').replace(/\..+/, '');
   return `./processed-${timestamp}`;
 };
 
-// Validate required environment variables
+/**
+ * Validates required environment variables.
+ * Checks if OPENAI_API_KEY and OPENAI_MODEL are set in the .env file.
+ * Exits the process with code 1 if any required variable is missing.
+ *
+ * @throws {Error} Exits process if required environment variables are not set
+ */
 const validateEnv = () => {
   if (!process.env.OPENAI_API_KEY) {
     console.error(chalk.red('Error: OPENAI_API_KEY is not set in .env file'));
@@ -53,7 +67,19 @@ const validateEnv = () => {
   }
 };
 
-// Process a file with the LLM
+/**
+ * Processes a file with an LLM using the provided prompt.
+ * 
+ * @param {string} promptContent - The content of the prompt to send to the LLM.
+ * @param {string} fileContent - The content of the file to be processed.
+ * @param {string} fileName - The name of the file being processed.
+ * @returns {Object|null} An object containing the processed content and file name, or null if processing failed.
+ *                        For dry runs, returns an object with the prompt and fileName.
+ * 
+ * @example
+ * // Process a file with the LLM
+ * const result = await processFileWithLLM(promptText, fileText, 'example.js');
+ */
 const processFileWithLLM = async (promptContent, fileContent, fileName) => {
   // Combine prompt and file content
   const systemPrompt = `You are a file processing assistant. Follow the rules below to process the provided file content.`;
@@ -125,7 +151,19 @@ Only return valid JSON that matches this schema exactly. Do not include any expl
   }
 };
 
-// Validate prompt with LLM (only for bulk processing)
+/**
+ * Validates a prompt with the LLM to ensure it's suitable for file processing.
+ * 
+ * @param {string} promptContent - The content of the prompt to validate.
+ * @returns {boolean} True if the prompt is valid, false otherwise.
+ * 
+ * @example
+ * // Validate a prompt before batch processing
+ * const isValid = await validatePrompt(promptText);
+ * if (isValid) {
+ *   // Proceed with batch processing
+ * }
+ */
 const validatePrompt = async (promptContent) => {
   const validationPrompt = `
 Please evaluate the following prompt and decide if it is a valid prompt that can be used to process a text file and return a structured JSON output.
@@ -191,8 +229,19 @@ Return only JSON in the following format:
   }
 };
 
-// Process files in batches
-// Process files in batches and collect results
+/**
+ * Processes files in batches and collects the results.
+ * 
+ * @param {string} promptContent - The content of the prompt to use for processing.
+ * @param {Array<string>} files - Array of file paths to process.
+ * @param {string} outputDir - The directory to save processed files to.
+ * @param {number} batchSize - The number of files to process in one batch.
+ * @returns {Array<Object>} Array of objects containing the processed files' information.
+ * 
+ * @example
+ * // Process a batch of files
+ * const results = await processBatchAndCollect(promptText, fileList, './output', 5);
+ */
 const processBatchAndCollect = async (promptContent, files, outputDir, batchSize) => {
   const batches = _.chunk(files, batchSize);
   const allResults = [];
@@ -255,7 +304,86 @@ const processBatchAndCollect = async (promptContent, files, outputDir, batchSize
   return allResults;
 };
 
-// Main function
+/**
+ * Transforms a filename based on CLI options.
+ * 
+ * Applies insertBeforeExt and outputExt options to modify the filename.
+ * 
+ * @param {string} filename - The original filename.
+ * @returns {string} The transformed filename with modifications applied.
+ * 
+ * @example
+ * // Transform a filename using CLI options
+ * const newFilename = transformFilename('example.js');
+ */
+const transformFilename = (filename) => {
+  let basename = path.basename(filename);
+  const extname = path.extname(basename);
+  const nameWithoutExt = basename.slice(0, basename.length - extname.length);
+  
+  // Apply insert-before-ext option if provided
+  if (options.insertBeforeExt) {
+    basename = nameWithoutExt + options.insertBeforeExt + extname;
+  }
+  
+  // Apply output-ext option if provided
+  if (options.outputExt) {
+    // Check if the file already has the specified extension
+    const requestedExt = options.outputExt.startsWith('.') ? options.outputExt : `.${options.outputExt}`;
+    if (!basename.endsWith(requestedExt)) {
+      basename = basename + requestedExt;
+    }
+  }
+  
+  return basename;
+};
+
+/**
+ * Merges all processed files into a single output file.
+ * 
+ * @param {Array<Object>} results - Array of objects containing processed file information.
+ * @param {string} outputDir - The directory where the merged file will be saved.
+ * @param {string} mergeOutputFilename - The filename for the merged output file.
+ * @returns {Promise<void>}
+ * 
+ * @example
+ * // Merge processed files into a single output
+ * await mergeProcessedFiles(results, './output', 'merged-output.txt');
+ */
+const mergeProcessedFiles = async (results, outputDir, mergeOutputFilename) => {
+  if (results.length === 0) {
+    console.log(chalk.yellow('No files to merge.'));
+    return;
+  }
+  
+  // Use the provided filename directly for the merged file
+  const mergePath = path.join(outputDir, mergeOutputFilename);
+  
+  // Create the merged content
+  let mergedContent = '';
+  
+  for (const result of results) {
+    mergedContent += `\n\n# File: ${result.filename}\n\n${result.content}`;
+  }
+  
+  // Write the merged file
+  await fs.writeFile(mergePath, mergedContent.trim());
+  console.log(chalk.green(`Merged ${results.length} files into: ${mergePath}`));
+};
+
+/**
+ * Main function that orchestrates the file processing workflow.
+ * 
+ * Validates environment variables and options, reads files, processes them with the LLM,
+ * and handles output including potential file merging.
+ * 
+ * @async
+ * @returns {Promise<void>}
+ * 
+ * @example
+ * // Execute the main function
+ * main();
+ */
 const main = async () => {
   try {
     validateEnv();
@@ -369,49 +497,3 @@ const main = async () => {
 };
 
 main();
-
-// Transform filename based on CLI options
-const transformFilename = (filename) => {
-  let basename = path.basename(filename);
-  const extname = path.extname(basename);
-  const nameWithoutExt = basename.slice(0, basename.length - extname.length);
-  
-  // Apply insert-before-ext option if provided
-  if (options.insertBeforeExt) {
-    basename = nameWithoutExt + options.insertBeforeExt + extname;
-  }
-  
-  // Apply output-ext option if provided
-  if (options.outputExt) {
-    // Check if the file already has the specified extension
-    const requestedExt = options.outputExt.startsWith('.') ? options.outputExt : `.${options.outputExt}`;
-    if (!basename.endsWith(requestedExt)) {
-      basename = basename + requestedExt;
-    }
-  }
-  
-  return basename;
-};
-
-
-// Merge processed files into a single output file
-const mergeProcessedFiles = async (results, outputDir, mergeOutputFilename) => {
-  if (results.length === 0) {
-    console.log(chalk.yellow('No files to merge.'));
-    return;
-  }
-  
-  // Use the provided filename directly for the merged file
-  const mergePath = path.join(outputDir, mergeOutputFilename);
-  
-  // Create the merged content
-  let mergedContent = '';
-  
-  for (const result of results) {
-    mergedContent += `\n\n# File: ${result.filename}\n\n${result.content}`;
-  }
-  
-  // Write the merged file
-  await fs.writeFile(mergePath, mergedContent.trim());
-  console.log(chalk.green(`Merged ${results.length} files into: ${mergePath}`));
-};
