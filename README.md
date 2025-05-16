@@ -90,21 +90,38 @@ llm-file-processor --prompt-file path/to/prompt.txt --directory path/to/project/
 # Preview prompts without API calls
 llm-file-processor -p prompt.txt -f file.md --dry-run
 
-# Batch process with custom settings\ nllm-file-processor -p rules.txt -d src -b 5 --delay 1000
+# Generate test files with modified filenames
+llm-file-processor -p test-generation.txt -f userAuthentication.js --insert-before-ext ".test"
+
+# Process log files and output as JSON
+llm-file-processor -p extract-data.txt -d logs/ --output-ext json
+
+# Process multiple files and merge results into a single output
+llm-file-processor -p extract-data.txt -d logs/ -m json
+
+# Process files and merge with custom extension
+llm-file-processor -p summarize.txt -d articles/ -m md --output-ext summary.md
+
+# Batch process with custom settings
+llm-file-processor -p rules.txt -d src -b 5 --delay 1000
 ```
 
 ### CLI Options
 
-| Option                      | Description                                             |
-| --------------------------- | ------------------------------------------------------- |
-| `-p, --prompt-file <file>`  | Path to the prompt file (required)                      |
-| `-f, --file <file>`         | Path to a single file to process                        |
-| `-d, --directory <dir>`     | Path to a directory of files to process                 |
-| `--dry-run`                 | Combine prompts and files without sending to LLM        |
-| `-b, --batch-size <number>` | Number of files per batch (default: 1)                  |
-| `--delay <ms>`              | Milliseconds to wait between API batches (default: 500) |
-| `-h, --help`                | Display help information                                |
-| `-v, --version`             | Display version information                             |
+| Option                        | Description                                                                           |
+| ----------------------------- | ------------------------------------------------------------------------------------- |
+| `-p, --prompt-file <file>`    | Path to the prompt file (required)                                                    |
+| `-f, --file <file>`           | Path to a single file to process                                                      |
+| `-d, --directory <dir>`       | Path to a directory of files to process                                               |
+| `-o, --output <dir>`          | Specify a custom output directory (default: `./processed-<timestamp>`)                |
+| `--insert-before-ext <text>`  | Insert text before file extension (e.g., ".test" for "file.test.js" from "file.js")   |
+| `--output-ext <extension>`    | Change or add file extension (e.g., "json" to save as "file.log.json")                |
+| `-m, --merge <filename>`      | Merge all processed files into a single output file "<filename>"                      |
+| `--dry-run`                   | Combine prompts and files without sending to LLM                                      |
+| `-b, --batch-size <number>`   | Number of files per batch (default: 1)                                                |
+| `--delay <ms>`                | Milliseconds to wait between API batches (default: 500)                               |
+| `-h, --help`                  | Display help information                                                              |
+| `-v, --version`               | Display version information                                                           |
 
 ## Writing Effective Prompts
 
